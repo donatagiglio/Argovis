@@ -85,7 +85,7 @@ if sum(examples2run==1)~=0
         'up_radiance490' 'up_radiance555' 'downwelling_par' ...
         };
     vars2query_units = {'degC' 'psu' 'mmol/kg'};
-    for ivars2query=1;length(vars2query)
+    for ivars2query=1:length(vars2query)
         %%%% set parameters
         xaxis_var            = vars2query{ivars2query};% this could be any of the other bgc variables
         yaxis_var            = 'pres';
