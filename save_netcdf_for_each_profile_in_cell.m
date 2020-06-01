@@ -26,7 +26,7 @@ function save_netcdf_for_each_profile_in_cell(data,var2save_in_nc,var2save_in_nc
 
 for i=1:length(data)
     clear filename_out mySchema
-    if ~isempty(data.pres{i})
+    if isfield(data,'pres') && ~isempty(data.pres{i})
         filename_out = [path_out_nc data.x_id{i} '.nc'];
         if exist(filename_out,'file')~=0
             eval(['! rm ' filename_out])
