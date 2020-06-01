@@ -76,39 +76,54 @@ if sum(examples2run==1)~=0
     %%%% EXAMPLE 1: query bgc Argo profiles in a region and time period
     %%%% of interest
     %
-    %%%% set parameters
-    xaxis_var            = 'doxy';% this could be any of the other bgc variables
-    yaxis_var            = 'pres';
-    % flag to save a netcdf file for each profile
-    flag_save_nc         = 1;% this saves the variable of interest in a netcdf
-    % file for each profile
-    var2save_in_nc       = {'doxy'};
-    var2save_in_nc_units = {'mmol/kg'};
-    path_out_nc          = ['/Users/dgiglio/Downloads/Argovis_nc/' xaxis_var '_'];
-    %
-    bgc_mode             = 1;
-    url_beginning        = ...
-        ['https://argovis.colorado.edu/selection/bgc_data_selection?' ...
-        'xaxis=' xaxis_var '&yaxis=' yaxis_var '&'];
-    %%%% query profiles
-    data_out             = ...
-        Argovis_regional_query(years,end_month,...
-        presRange,shape2use,url_beginning,bgc_mode,...
-        var2save_in_nc,var2save_in_nc_units,path_out_nc);
-    %%%% plot profiles that were queried
-    close all
-    fig_pos  = [0.1        0.1       1420        700];
-    figure('color','w','position',fig_pos.*[1 1 1 1]);
-    subplot(1,3,1)
-    Argovis_plot_profile_location_and_WMO(data_out,xaxis_var)
-    %
-    subplot(1,3,2)
-    Argovis_plot_profiles(data_out,xaxis_var,yaxis_var)
-    %
-    subplot(1,3,3)
-    Argovis_plot_bgc_qc(data_out,xaxis_var,yaxis_var,presRange)
-    set(gcf,'PaperPositionMode','auto');
-    print('-dpng',['Argovis_example01.png'],'-r150')
+    vars2query= {...
+        'temp' 'psal' 'doxy' 'bbp' 'bbp470' 'bbp532' 'bbp700' 'turbidity' ...
+        'cp' 'cp660' 'chla' 'cdom' 'nitrate' 'bisulfide' 'ph_in_situ_total' ...
+        'down_irradiance' 'down_irradiance380' 'down_irradiance412' ...
+        'down_irradiance443' 'down_irradiance490' 'down_irradiance555' ...
+        'up_radiance' 'up_radiance412' 'up_radiance443' 'up_radiance443_qc' ...
+        'up_radiance490' 'up_radiance555' 'downwelling_par' ...
+        };
+    vars2query_units = {'degC' 'psu' 'mmol/kg'};
+    for ivars2query=1;length(vars2query)
+        %%%% set parameters
+        xaxis_var            = vars2query{ivars2query};% this could be any of the other bgc variables
+        yaxis_var            = 'pres';
+        % flag to save a netcdf file for each profile
+        flag_save_nc         = 1;% this saves the variable of interest in a netcdf
+        % file for each profile
+        var2save_in_nc       = vars2query(ivars2query);
+        if length(vars2query_units)>=ivars2query
+            var2save_in_nc_units = vars2query_units(ivars2query);
+        else
+            var2save_in_nc_units = {''};
+        end
+        path_out_nc          = ['/Users/dgiglio/Downloads/Argovis_nc/' xaxis_var '_'];
+        %
+        bgc_mode             = 1;
+        url_beginning        = ...
+            ['https://argovis.colorado.edu/selection/bgc_data_selection?' ...
+            'xaxis=' xaxis_var '&yaxis=' yaxis_var '&'];
+        %%%% query profiles
+        data_out             = ...
+            Argovis_regional_query(years,end_month,...
+            presRange,shape2use,url_beginning,bgc_mode,...
+            var2save_in_nc,var2save_in_nc_units,path_out_nc);
+        %%%% plot profiles that were queried
+        close all
+        fig_pos  = [0.1        0.1       1420        700];
+        figure('color','w','position',fig_pos.*[1 1 1 1]);
+        subplot(1,3,1)
+        Argovis_plot_profile_location_and_WMO(data_out,xaxis_var)
+        %
+        subplot(1,3,2)
+        Argovis_plot_profiles(data_out,xaxis_var,yaxis_var)
+        %
+        subplot(1,3,3)
+        Argovis_plot_bgc_qc(data_out,xaxis_var,yaxis_var,presRange)
+        set(gcf,'PaperPositionMode','auto');
+        print('-dpng',['Argovis_example01' xaxis_var '.png'],'-r150')
+    end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if sum(examples2run==2)~=0
