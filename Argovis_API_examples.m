@@ -98,7 +98,7 @@ if sum(examples2run==1)~=0
         else
             var2save_in_nc_units = {''};
         end
-        path_out_nc          = ['/Users/dgiglio/Downloads/Argovis_nc/' xaxis_var '_'];
+        path_out_nc          = [pwd, '/', xaxis_var '_'];
         %
         bgc_mode             = 1;
         url_beginning        = ...
@@ -178,7 +178,7 @@ if sum(examples2run==3)~=0
     % are available for the float of interest)
     url0      = ['https://argovis.colorado.edu/catalog/bgc_platform_data/' ...
         platform_number '/?xaxis=pres&yaxis=temp'];
-    opt = weboptions('Timeout',20,'UserAgent', 'http://www.whoishostingthis.com/tools/user-agent/');
+    opt = weboptions('Timeout',20,'UserAgent', 'http://www.whoishostingthis.com/tools/user-agent/', 'CertificateFilename','');
     data0     = webread(url0,opt);
     % create a list of all the variables available
     vars_names = {};
