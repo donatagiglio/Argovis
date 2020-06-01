@@ -109,20 +109,22 @@ if sum(examples2run==1)~=0
             Argovis_regional_query(years,end_month,...
             presRange,shape2use,url_beginning,bgc_mode,...
             var2save_in_nc,var2save_in_nc_units,path_out_nc);
-        %%%% plot profiles that were queried
-        close all
-        fig_pos  = [0.1        0.1       1420        700];
-        figure('color','w','position',fig_pos.*[1 1 1 1]);
-        subplot(1,3,1)
-        Argovis_plot_profile_location_and_WMO(data_out,xaxis_var)
-        %
-        subplot(1,3,2)
-        Argovis_plot_profiles(data_out,xaxis_var,yaxis_var)
-        %
-        subplot(1,3,3)
-        Argovis_plot_bgc_qc(data_out,xaxis_var,yaxis_var,presRange)
-        set(gcf,'PaperPositionMode','auto');
-        print('-dpng',['Argovis_example01' xaxis_var '.png'],'-r150')
+        %%%% plot profiles that were queried, if any
+        if isfield(data_out,xaxis_var)
+            close all
+            fig_pos  = [0.1        0.1       1420        700];
+            figure('color','w','position',fig_pos.*[1 1 1 1]);
+            subplot(1,3,1)
+            Argovis_plot_profile_location_and_WMO(data_out,xaxis_var)
+            %
+            subplot(1,3,2)
+            Argovis_plot_profiles(data_out,xaxis_var,yaxis_var)
+            %
+            subplot(1,3,3)
+            Argovis_plot_bgc_qc(data_out,xaxis_var,yaxis_var,presRange)
+            set(gcf,'PaperPositionMode','auto');
+            print('-dpng',['Argovis_example01' xaxis_var '.png'],'-r150')
+        end
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
