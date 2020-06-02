@@ -35,7 +35,17 @@ clear all
 close all
 set(0, 'DefaultFigureVisible', 'off')
 
-cd ~/Downloads/
+%make dirs to store data
+data_folder = [pwd, '/data/'];
+if ~isfolder(data_folder)
+     mkdir data
+end
+nc_path = [data_folder, 'Argovis_nc'];
+if ~isfolder(nc_path)
+    mkdir data/Argovis_nc
+end
+
+% cd ~/Downloads/ % lets just keep the directory structure simple, ok?
 examples2run = [1 2 3];
 disp('>>>> Argovis examples running: ')
 disp(num2str(examples2run))
@@ -71,7 +81,7 @@ end_month = 12; % if not 12, set one month more than when you want your last mon
 % set pressure range of interest
 presRange='[0,2000]';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if sum(examples2run==1)~=0
+if any(examples2run==1)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%% EXAMPLE 1: query bgc Argo profiles in a region and time period
     %%%% of interest
@@ -98,7 +108,7 @@ if sum(examples2run==1)~=0
         else
             var2save_in_nc_units = {''};
         end
-        path_out_nc          = [pwd, '/', xaxis_var '_'];
+        path_out_nc          = [nc_path, '/', xaxis_var '_'];
         %
         bgc_mode             = 1;
         url_beginning        = ...
@@ -128,7 +138,7 @@ if sum(examples2run==1)~=0
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if sum(examples2run==2)~=0
+if any(examples2run==2)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%% EXAMPLE 2: query core/Deep Argo profiles in a region and time period
     %%%% of interest
@@ -141,7 +151,7 @@ if sum(examples2run==2)~=0
     % file for each profile
     var2save_in_nc       = {'temp' 'psal'};
     var2save_in_nc_units = {'degC' 'psu'};
-    path_out_nc          = '/Users/dgiglio/Downloads/Argovis_nc/core_';
+    path_out_nc          = [nc_path, '/core_'];
     %
     bgc_mode             = 0;
     url_beginning        = 'https://argovis.colorado.edu/selection/profiles/?';
@@ -162,7 +172,7 @@ if sum(examples2run==2)~=0
     print('-dpng',['Argovis_example02.png'],'-r150')
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if sum(examples2run==3)~=0
+if any(examples2run==3)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%% EXAMPLE 3: Query all profiles/variables (including bgc) from a
     %%%% platform and make plots. At this moment in time, this query returns
