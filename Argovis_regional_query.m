@@ -42,28 +42,35 @@ for l=1:length(t)
             shape2use];
         % now we upload variables
         data = Argovis_get_profiles(url,bgc_mode);
-        vars = fields(data);
         
-        for i=1:length(vars)
-            % initialize
-            if ~exist(vars{i},'var')
-                eval(['dataOUT.' vars{i} ' = {};'])
+        if ~isempty(data)
+            vars = fields(data);
+            
+            for i=1:length(vars)
+                % initialize
+                if ~exist(vars{i},'var')
+                    eval(['dataOUT.' vars{i} ' = {};'])
+                end
+                eval(['dataOUT.' vars{i} ' = cat(1,dataOUT.' vars{i} ',data.' vars{i} ''');'])
             end
-            eval(['dataOUT.' vars{i} ' = cat(1,dataOUT.' vars{i} ',data.' vars{i} ''');'])
-        end
-        
-        if ~isempty(var2save_in_nc)
-            % save one netcdf for each profile in the cells in data
-            save_netcdf_for_each_profile_in_cell(...
-                data,var2save_in_nc,var2save_in_nc_units,path_out_nc);
+            
+            if ~isempty(var2save_in_nc)
+                % save one netcdf for each profile in the cells in data
+                save_netcdf_for_each_profile_in_cell(...
+                    data,var2save_in_nc,var2save_in_nc_units,path_out_nc);
+            end
         end
     end
 end
-% save platform number
-dataOUT.platform_number = {};
-for i=1:length(dataOUT.x_id)
-    clear bfr
-    bfr = strsplit(dataOUT.x_id{i},'_');
-    dataOUT.platform_number{i} = str2double(bfr{1});
+if exist(dataOUT,'var')==1
+    % save platform number
+    dataOUT.platform_number = {};
+    for i=1:length(dataOUT.x_id)
+        clear bfr
+        bfr = strsplit(dataOUT.x_id{i},'_');
+        dataOUT.platform_number{i} = str2double(bfr{1});
+    end
+else
+    dataOUT = [];
 end
 return
