@@ -54,7 +54,7 @@ for l=1:length(t)
                 eval(['dataOUT.' vars{i} ' = cat(1,dataOUT.' vars{i} ',data.' vars{i} ''');'])
             end
             
-            if ~isempty(var2save_in_nc)
+            if ~isempty(var2save_in_nc{1})
                 % save one netcdf for each profile in the cells in data
                 save_netcdf_for_each_profile_in_cell(...
                     data,var2save_in_nc,var2save_in_nc_units,path_out_nc);
@@ -62,7 +62,7 @@ for l=1:length(t)
         end
     end
 end
-if exist(dataOUT,'var')==1
+if exist('dataOUT','var')==1
     % save platform number
     dataOUT.platform_number = {};
     for i=1:length(dataOUT.x_id)

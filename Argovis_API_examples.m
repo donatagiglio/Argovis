@@ -99,8 +99,7 @@ if any(examples2run==1)
         %%%% set parameters
         xaxis_var            = vars2query{ivars2query};% this could be any of the other bgc variables
         yaxis_var            = 'pres';
-        % flag to save a netcdf file for each profile
-        flag_save_nc         = 1;% this saves the variable of interest in a netcdf
+        % saving the variable of interest in a netcdf
         % file for each profile
         var2save_in_nc       = vars2query(ivars2query);
         if length(vars2query_units)>=ivars2query
@@ -146,10 +145,9 @@ if any(examples2run==2)
     %%%% set parameters
     xaxis_var            = 'temp';% this could be any of the other bgc variables
     yaxis_var            = 'pres';
-    % flag to save a netcdf file for each profile
-    flag_save_nc         = 1;% this saves the variable of interest in a netcdf
+    % saving the variable of interest in a netcdf
     % file for each profile
-    var2save_in_nc       = {'temp' 'psal'};
+    var2save_in_nc       = {'temp' 'psal'};% var2save_in_nc = {''} if you don't want to save anything
     var2save_in_nc_units = {'degC' 'psu'};
     path_out_nc          = [nc_path, '/core_'];
     %
