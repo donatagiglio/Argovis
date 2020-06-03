@@ -79,6 +79,7 @@ end
 disp(url)
 tic;data = webread(url,opt);toc;
 
+data_out = [];
 if ~isempty(data)
     for i=1:length(data)
         for j=1:length(vars)
