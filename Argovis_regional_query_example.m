@@ -38,7 +38,7 @@ if ~isfolder(nc_path)
     mkdir data/Argovis_nc
 end
 
-examples2run = [1];% 1 is only BGC profiles. 2 is all profiles
+examples2run = 2;%[1 2];% 1 is only BGC profiles. 2 is T/S/p for all profiles
 disp('>>>> Argovis examples running: ')
 disp(num2str(examples2run))
 disp('>>>> To change whether bgc or core is running, edit the variable ''examples2run''')
@@ -203,9 +203,13 @@ for i=1:length(platform_number_unique)
     bfrx_msk = bfrx(msk);bfry_msk = bfry(msk);
     for j=1:length(bfrx_msk)
        % if ~isempty(bfrx_msk{j})
-        plot(bfrx_msk{j},bfry_msk{j},'-',...
-            'color',platform_number_unique_cols(i,:))
-        hold on
+       try
+           plot(bfrx_msk{j},bfry_msk{j},'-',...
+               'color',platform_number_unique_cols(i,:))
+           hold on
+       catch
+           
+       end
        % end
     end
 end

@@ -1,4 +1,4 @@
-function dataOUT = Argovis_regional_query(years,months,...
+function dataOUT = Argovis_get_regional(years,months,...
     presRange,shape2use,url_beginning,bgc_mode,...
     var2save_in_nc,var2save_in_nc_units,path_out_nc)
 % Description to add for input/output
@@ -28,7 +28,6 @@ end_year  = max(years);
 end_month = max(months);
 mm_ALL   = min(months):end_month;
 
-%[YR,M]   = meshgrid(years,mm_ALL);
 [YR,M]   = meshgrid(years,months);
 t        = datenum(YR(:),M(:),15);
 t_eomday = eomdate(YR(:),M(:));
