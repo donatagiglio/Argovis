@@ -21,15 +21,15 @@
 %
 clear all
 close all
-set(0, 'DefaultFigureVisible', 'off')
+set(0, 'DefaultFigureVisible', 'on')
 
 %%%%%%%%%%%% select start and end month of interest specifying a date
-date_start = datenum(2015,2,3); % e.g. the starting month will be Feb 2008 
+date_start = datenum(2020,4,1); % e.g. the starting month will be Feb 2008 
 % (regardless of what you specify as "day" [in this example the "day" 
 % is the 3rd of the month], metadata for the whole month
 % will be returned; if intersted in restricting also based on the "day",
 % you can code that in later (please ask us if you have any questions!)
-date_end   = datenum(2016,4,10);% in this case, metadata will be queried up 
+date_end   = datenum(2020,6,1);% in this case, metadata will be queried up 
 % to the full Jan 2009 included, even if the "day" is specified as the 10th
 % of the month)
 
@@ -43,11 +43,11 @@ months     = MMYY(:,2);
 % loop through months and years in the period of interest
 tic;
 for i=1:size(MMYY,1)
-    data_out{i} = Argovis_get_Argo_metadata(months(i),years(i));
+    tic;data_out{i} = Argovis_get_Argo_metadata(months(i),years(i));toc;
 end
 toc;
 
-%% plot a map for profile density in all the years
+%% create count of profiles by lon/lat boxes
 close all
 dx = 1; dy= 1;
 lon_edges  = -180:dx:180;lon_bin = lon_edges(1:end-1)+dx;
@@ -57,15 +57,43 @@ for i=1:size(MMYY,1)
     hist_map(:,:,i) = histcounts2(cell2mat(data_out{i}.lon),...
         cell2mat(data_out{i}.lat),lon_edges,lat_edges);
 end
-% plot (to write in function)
-% Rescale data 1-64
+
+% plot map for sum over the full period
 d       = sum(hist_map,3)';
+map_prof_num_by_bin(d,lon_bin,lat_bin)
+
+%% plot timeseries for positioning system (or similar)
+var_name = 'POSITIONING_SYSTEM';
+% find the options
+opts = '';
+for i=1:size(MMYY,1)
+    bfr_new = eval(['data_out{i}.' var_name]);
+    if i==1
+        opts = unique(bfr_new);
+    else
+        opts = unique([opts bfr_new]);
+    end
+end
+% count each option occurence per month and make a plot
+num = nan(size(MMYY,1),length(opts));
+for i=1:size(MMYY,1)
+    for j=1:length(opts)
+        num(i,j) = sum(strcmp(eval(['data_out{i}.' var_name]),opts{j}));
+    end
+end
+fig_pos  = [0.1        0.1       1420        400];
+figure('color','w','position',fig_pos.*[1 1 1 1]);
+bar(datenum(years,months,15),num,'stacked');legend(opts)
+datetick('x','mmm-yy')
+set(gca,'fontsize',22,'linewidth',2)
+%%
+function map_prof_num_by_bin(d,lon,lat)
+% Rescale data 1-64
 d(d==0) = nan;
 d       = log10(d);
 mn      = min(d(:));
 rng     = max(d(:))-mn;
 d       = 1+63*(d-mn)/rng; % Self scale data
-
 L       = [0.01 0.02 0.05 0.1 0.2 0.5 1 2 5 10 20 50 100 200 500 1000 2000 5000];%
 L_tag   = {'0.01' '0.02' '0.05' '0.1' '0.2' '0.5' '1' '2' '5' '10' '20' '50' '100' '200' '500' '1000' '2000' '5000'};%];
 % Choose appropriate or somehow auto generate colorbar labels
@@ -73,10 +101,14 @@ l       = 1+63*(log10(L)-mn)/rng; % Tick mark positions
 
 fig_pos  = [0.1        0.1       1420        700];
 figure('color','w','position',fig_pos.*[1 1 1 1]);
-pcolor(lon_bin,lat_bin,d);shading flat;colorbar
+%pcolor(lon,lat,d);shading flat;colorbar
+imsc = imagesc(lon,lat,d);axis xy
+set(imsc,'AlphaData',~isnan(d))
+colormap('parula');%colormap([[1 1 1]; parula(32)]);
 hC = colorbar;
 set(hC,'Ytick',l,'YTicklabel',L_tag);
 set(hC,'position',[.925 .38 .02 .3],'fontsize',24)
 set(gca,'fontsize',22,'linewidth',2,'fontweight','bold')
 
 geoshow('landareas.shp', 'FaceColor', [.8 .8 .8],'edgecolor',[.25 .25 .25]); 
+end

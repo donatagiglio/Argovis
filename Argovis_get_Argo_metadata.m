@@ -42,7 +42,7 @@ url = ['http://argovis.colorado.edu/selection/profiles/' ...
                 num2str(month_of_interest) '/' num2str(year_of_interest) '/'];
 disp(url)
 opt = weboptions('Timeout',40,'UserAgent', 'http://www.whoishostingthis.com/tools/user-agent/', 'CertificateFilename','');
-tic;data = webread(url,opt);toc;
+data = webread(url,opt);
 
 data_out = [];
 if ~isempty(data)
@@ -52,17 +52,12 @@ if ~isempty(data)
         end
         
         for j=1:length(vars)
-            if iscell(data)
+            try
+                eval([vars{j} '0 = data{i}.' vars{j} ';'])
+            catch
                 try
-                        eval([vars{j} '0 = return_field_from_cell({data{i}.' vars{j} '});'])
-                    catch
-                        %disp([vars{j} ' was not found: is the name entered correct?'])
-                end
-            elseif isstruct(data)
-                try
-                    eval([vars{j} '0 = return_field_from_cell({data(i).' vars{j} '});'])
+                    eval([vars{j} '0 = data(i).' vars{j} ';'])
                 catch
-                    %disp([vars{j} ' was not found: is the name entered correct?'])
                 end
             end
         end
@@ -87,9 +82,12 @@ for i=1:length(vars)
 end
 
 end
-function data_out = return_field_from_cell(data_in) %#ok<DEFNU>
-fx=@(x)any(isempty(x));
-ind=cellfun(fx,data_in);
-data_in(ind)={nan};
-data_out = cell2mat(data_in);
-end
+
+% fx=@(x)x.lon;
+% test = arrayfun(fx,data{:});
+% function data_out = return_field_from_cell(data_in) %#ok<DEFNU>
+% fx=@(x)any(isempty(x));
+% ind=cellfun(fx,data_in);
+% data_in(ind)={nan};
+% data_out = cell2mat(data_in);
+% end
