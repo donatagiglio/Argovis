@@ -28,6 +28,10 @@ function data_out = Argovis_get_Argo_metadata(month_of_interest,year_of_interest
 % data_out is a structure and contains metadata for the month and year of interest
 %
 % query info
+
+% these are all the possible metadata; this script returns only those that
+% are there for all the profiles in that month/year... hence 
+% 'VERTICAL_SAMPLING_SCHEME' may not returned for instance
 vars= {'x_id' 'POSITIONING_SYSTEM' 'PI_NAME' 'VERTICAL_SAMPLING_SCHEME' ...
     'DATA_MODE' 'PLATFORM_TYPE' 'station_parameters' 'date' 'date_added'  ...
     'date_qc' 'lat' 'lon' 'position_qc' 'cycle_number' 'dac' 'platform_number' ...
@@ -41,50 +45,21 @@ end
 url = ['http://argovis.colorado.edu/selection/profiles/' ...
                 num2str(month_of_interest) '/' num2str(year_of_interest) '/'];
 disp(url)
-opt = weboptions('Timeout',40,'UserAgent', 'http://www.whoishostingthis.com/tools/user-agent/', 'CertificateFilename','');
+opt  = weboptions('Timeout',40,'UserAgent', 'http://www.whoishostingthis.com/tools/user-agent/', 'CertificateFilename','');
 data = webread(url,opt);
 
-data_out = [];
-if ~isempty(data)
-    for i=1:length(data)
-        for j=1:length(vars)
-            eval(['clear ' vars{j} '0'])
-        end
-        
-        for j=1:length(vars)
-            try
-                eval([vars{j} '0 = data{i}.' vars{j} ';'])
-            catch
-                try
-                    eval([vars{j} '0 = data(i).' vars{j} ';'])
-                catch
-                end
-            end
-        end
-        %
-        for j=1:length(vars)
-            if exist([vars{j} '0'],'var') && ~strcmp([vars{j} '0'],'date0')
-                eval([vars{j} '{end+1} = ' vars{j} '0;'])
-            elseif ~strcmp([vars{j} '0'],'date0')
-                eval([vars{j} '{end+1} = [];'])
-            end
-        end
-        date{end+1} = datenum(str2num(date0(1:4)),str2num(date0(6:7)),str2num(date0(9:10)),...
-            str2num(date0(12:13)),str2num(date0(15:16)),str2num(date0(18:19)));
-    end
-end
-
 for i=1:length(vars)
-    clear bfr; bfr = cellfun(@isempty,eval([vars{i} ]));
-    if sum(bfr)~=length(bfr)
-        eval(['data_out.' vars{i} ' = ' vars{i} ';'])
+    try
+        eval(['fx=@(x)x.' vars{i} ';'])
+        bfr = cellfun(fx,data,'UniformOutput',false);
+        eval(['data_out.' vars{i} ' = bfr;'])
+    catch
+        
     end
 end
 
 end
 
-% fx=@(x)x.lon;
-% test = arrayfun(fx,data{:});
 % function data_out = return_field_from_cell(data_in) %#ok<DEFNU>
 % fx=@(x)any(isempty(x));
 % ind=cellfun(fx,data_in);

@@ -22,9 +22,13 @@
 clear all
 close all
 set(0, 'DefaultFigureVisible', 'on')
-
+%make dirs to store figures
+data_folder = [pwd, '/Argovis_figures/'];
+if ~isfolder(data_folder)
+     mkdir Argovis_figures
+end
 %%%%%%%%%%%% select start and end month of interest specifying a date
-date_start = datenum(2020,4,1); % e.g. the starting month will be Feb 2008 
+date_start = datenum(2004,4,1); % e.g. the starting month will be Feb 2008 
 % (regardless of what you specify as "day" [in this example the "day" 
 % is the 3rd of the month], metadata for the whole month
 % will be returned; if intersted in restricting also based on the "day",
@@ -61,6 +65,41 @@ end
 % plot map for sum over the full period
 d       = sum(hist_map,3)';
 map_prof_num_by_bin(d,lon_bin,lat_bin)
+set(gcf,'PaperPositionMode','auto');
+print('-dpng',['./Argovis_figures/Argovis_prof_in_boxes_' ...
+    datestr(date_start,'mmmyyyy') '_' datestr(date_end,'mmmyyyy') '.png'],'-r150')
+%% create count of max pres for temp
+var_val = 'pres_max_for_TEMP';delta = 100;
+var_val_title = 'Number of profiles measuring temperature up to different pressure layers (dbar in legend)';
+var_val_edges = 0:delta:2000;var_val_bins = var_val_edges(1:end-1) + delta;
+hist_var = zeros(length(var_val_bins),size(MMYY,1));
+for i=1:size(MMYY,1)
+    clear bfr
+    eval(['bfr = data_out{i}.' var_val ';'])
+    hist_var(:,i) = histcounts(cell2mat(bfr),var_val_edges);
+end
+fig_pos  = [0.1        0.1       1420        600];
+figure('color','w','position',fig_pos.*[1 1 1 1]);
+tax = datenum(years,months,15);
+% %pcolor(tax,var_val_bins,hist_var);shading flat;colorbar
+
+% cc = parula(length(var_val_bins));
+% for i=1:length(var_val_bins)
+%     plot(tax,hist_var(i,:)','color',cc(i,:),'linewidth',2)
+%     hold on
+% end
+% set(gca,'fontsize',22,'linewidth',2,'xtick',tax(1:2:end))
+% datetick('x','mmm-yy')
+% legend({num2str(var_val_bins')},'location','eastoutside')
+% title(var_val_title)
+% % colormap(flipud(hot(32)))
+% % axis ij
+colormap(parula(length(tax)))
+bar(var_val_bins,hist_var','stacked','linestyle','none')
+set(gca,'fontsize',22,'linewidth',2)
+set(gcf,'PaperPositionMode','auto');
+print('-dpng',['./Argovis_figures/Argovis_' var_val '_' ...
+    datestr(date_start,'mmmyyyy') '_' datestr(date_end,'mmmyyyy') '.png'],'-r150')
 
 %% plot timeseries for positioning system (or similar)
 var_name = 'POSITIONING_SYSTEM';
@@ -71,7 +110,7 @@ for i=1:size(MMYY,1)
     if i==1
         opts = unique(bfr_new);
     else
-        opts = unique([opts bfr_new]);
+        opts = unique([opts; bfr_new]);
     end
 end
 % count each option occurence per month and make a plot
@@ -83,9 +122,13 @@ for i=1:size(MMYY,1)
 end
 fig_pos  = [0.1        0.1       1420        400];
 figure('color','w','position',fig_pos.*[1 1 1 1]);
-bar(datenum(years,months,15),num,'stacked');legend(opts)
+bar(tax,num,'stacked');legend(opts,'location','best')
+set(gca,'fontsize',22,'linewidth',2,'xtick',tax(1:2:end))
 datetick('x','mmm-yy')
-set(gca,'fontsize',22,'linewidth',2)
+set(gcf,'PaperPositionMode','auto');
+print('-dpng',['./Argovis_figures/Argovis_' var_name '_' ...
+    datestr(date_start,'mmmyyyy') '_' datestr(date_end,'mmmyyyy') '.png'],'-r150')
+
 %%
 function map_prof_num_by_bin(d,lon,lat)
 % Rescale data 1-64
@@ -107,7 +150,7 @@ set(imsc,'AlphaData',~isnan(d))
 colormap('parula');%colormap([[1 1 1]; parula(32)]);
 hC = colorbar;
 set(hC,'Ytick',l,'YTicklabel',L_tag);
-set(hC,'position',[.925 .38 .02 .3],'fontsize',24)
+set(hC,'position',[.925 .38 .02 .5],'fontsize',24)
 set(gca,'fontsize',22,'linewidth',2,'fontweight','bold')
 
 geoshow('landareas.shp', 'FaceColor', [.8 .8 .8],'edgecolor',[.25 .25 .25]); 
