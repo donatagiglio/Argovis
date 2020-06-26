@@ -42,44 +42,55 @@ end
 disp('>>>> Argovis platform API running: ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%% Query a platform and make plots. At this moment in time, this query returns
+%%%% Query a platform and make plots. For bgc platforms, this query returns
 %%%% all the data (no qc-based selection), along with the qc flag (as
 %%%% requested for bgc variables)
 %
 %%%% set parameters
-platform_number = '5904684';%'2903354'; %
+platform_number = '5904684';%'4903203';%'2903354'; %
 pressure_axis   = 5:10:6000;% (to be used for interpolation)
-bgc_mode        = 1;
+
 %%%% load variables available for that float
 % load data for one variable to look at the metadata (i.e. what variables
 % are available for the float of interest)
-url0      = ['https://argovis.colorado.edu/catalog/bgc_platform_data/' ...
-    platform_number '/?xaxis=pres&yaxis=temp'];
 opt = weboptions('Timeout',20,'UserAgent', 'http://www.whoishostingthis.com/tools/user-agent/', 'CertificateFilename','');
-data0     = webread(url0,opt);
 % create a list of all the variables available
 try
+    % bgc platform case
+    url0      = ['https://argovis.colorado.edu/catalog/bgc_platform_data/' ...
+        platform_number '/?xaxis=pres&yaxis=temp'];
+    data0     = webread(url0,opt);
+    bgc_mode        = 1;
+
     vars_names = {};
     for i=1:length(data0)
-        vars_names = unique({vars_names{:} data0(i).bgcMeasKeys{:}});
+        try
+            vars_names = unique({vars_names{:} data0(i).bgcMeasKeys{:}});
+        catch
+            vars_names = unique({vars_names{:} data0{i}.bgcMeasKeys{:}});
+        end
     end
     url_beginning = ['https://argovis.colorado.edu/catalog/bgc_platform_data/' ...
-            platform_number '/?xaxis=pres&yaxis='];
+        platform_number '/?xaxis=pres&yaxis='];
     
 catch
+    % non-bgc platform case
     url0      = ['https://argovis.colorado.edu/catalog/platforms/' ...
         platform_number '/?xaxis=pres&yaxis=temp'];
-    opt = weboptions('Timeout',20,'UserAgent', 'http://www.whoishostingthis.com/tools/user-agent/', 'CertificateFilename','');
     data0     = webread(url0,opt);
     bgc_mode = 0;
     % create a list of all the variables available
     
     vars_names = {};
     for i=1:length(data0)
-        vars_names = unique({vars_names{:} data0(i).station_parameters{:}});
+        try
+            vars_names = unique({vars_names{:} data0(i).station_parameters{:}});
+        catch
+            vars_names = unique({vars_names{:} data0{i}.station_parameters{:}});
+        end
     end
     url_beginning = ['https://argovis.colorado.edu/catalog/platforms/' ...
-            platform_number '/?xaxis=pres&yaxis='];
+        platform_number '/?xaxis=pres&yaxis='];
 end
 %%%% load data for each of the available variables and make a plot
 fig_pos  = [0.1        0.1       1420        700];
@@ -91,6 +102,12 @@ for ivar=1:length(vars_names)
         url     = [url_beginning vars_names{ivar}];
         %%%% query profiles
         data_out = Argovis_get_profiles(url,bgc_mode);
+        
+        if strcmp(vars_names{ivar},'temp')
+            lon_temp = data_out(:).lon;
+            lat_temp = data_out(:).lat;
+            date_temp= data_out(:).date;
+        end
         
         %%%% plots
         figure('color','w','position',fig_pos.*[1 1 1 1]);
@@ -114,7 +131,15 @@ for ivar=1:length(vars_names)
         print('-dpng',['Argovis_' platform_number '_' vars_names{ivar} '_pcolor.png'],'-r150')
     end
 end
-
+figure('color','w','position',fig_pos.*[1 1 1 1]);
+plot(cell2mat(lon_temp),cell2mat(lat_temp),'*')
+set(gca,'fontsize',26)
+axis tight
+xlabel('Longitude')
+ylabel('Latitude')
+title('Platform path')
+set(gcf,'PaperPositionMode','auto');
+print('-dpng',['Argovis_' platform_number '_path_temp.png'],'-r150')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%% OTHER FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -169,7 +194,7 @@ axis ij
 axis tight
 set(gca,'fontsize',26,'ylim',[floor(pmn) ceil(pmm)])
 datetick('x')
-title([var ' (data range=[' num2str(min(d_gridded(:))) ' ' ...
+title([var ', data range=[' num2str(min(d_gridded(:))) ' ' ...
     num2str(max(d_gridded(:))) ']'],'interpreter','none')
 if exist('cax','var')
     caxis(cax)
@@ -202,7 +227,7 @@ axis ij
 axis tight
 set(gca,'fontsize',26,'ylim',[floor(pmn) ceil(pmm)])
 datetick('x')
-title([var ' (data range=[' num2str(min(d_gridded(:))) ' ' ...
+title([var ', data range=[' num2str(min(d_gridded(:))) ' ' ...
     num2str(max(d_gridded(:))) ']'],'interpreter','none')
 if exist('cax','var')
     caxis(cax)
