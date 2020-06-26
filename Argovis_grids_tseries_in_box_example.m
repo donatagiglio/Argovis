@@ -1,5 +1,23 @@
 % script to query a gridded product on Argovis and plot the timeseries of
-% temprature averaged in a region
+% temperature averaged in a region + a time mean map. Please *NOTE* that
+% the API used here is a beta version and could change in the future as
+% more gridded products are added to Argovis and the infrastructure evolves
+% 
+% This function was written in Matlab 2020a.
+%
+% Citation for the Argovis web application and the Argovis database: 
+% Tucker, T., D. Giglio, M. Scanderbeg, and S.S.P. Shen, 0: Argovis: A Web 
+% Application for Fast Delivery, Visualization, and Analysis of Argo Data. 
+% J. Atmos. Oceanic Technol., 37, 401–416, https://doi.org/10.1175/JTECH-D-19-0041.1
+%
+% If using Argo data from Argovis in publications, please cite both the above 
+% Argovis web application paper and the original data source reference below 
+% in your paper.
+%
+% Roemmich, D. and J. Gilson, 2009: The 2004-2008 mean and annual cycle of 
+% temperature, salinity, and steric height in the global ocean from the Argo 
+% Program. Progress in Oceanography, 82, 81-100.
+%
 
 clear all
 close all
