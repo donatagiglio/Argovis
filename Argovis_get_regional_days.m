@@ -63,7 +63,8 @@ for l=1:length(t)
             if isfield(data,var2save_in_nc)
                 for i=1:length(vars)
                     % initialize
-                    if ~exist(vars{i},'var')
+                    if ~exist('dataOUT','var') || ...
+                            (exist('dataOUT','var') && ~isfield(dataOUT,vars{i}))
                         eval(['dataOUT.' vars{i} ' = {};'])
                     end
                     eval(['dataOUT.' vars{i} ' = cat(1,dataOUT.' vars{i} ',data.' vars{i} ''');'])

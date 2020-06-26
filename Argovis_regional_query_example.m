@@ -38,7 +38,7 @@ if ~isfolder(nc_path)
     mkdir data/Argovis_nc
 end
 
-examples2run = 2;%[1 2];% 1 is only BGC profiles. 2 is T/S/p for all profiles
+examples2run = 1;%[1 2];% 1 is only BGC profiles. 2 is T/S/p for all profiles
 disp('>>>> Argovis examples running: ')
 disp(num2str(examples2run))
 disp('>>>> To change whether bgc or core is running, edit the variable ''examples2run''')
@@ -46,8 +46,11 @@ disp('>>>> To change whether bgc or core is running, edit the variable ''example
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Parameters to set for querying Argo profiles in a region and time
 %%%%% period of interest
-% set shape/region
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% set shape/region
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tag_region = 'LabradorSea';%'box_example'; %
+% param used to define the region if we want a box
 lon_min    = '-165';%'-135';
 lon_max    = '-160';%'-130';
 lat_min    = '38';%'40';
@@ -66,11 +69,39 @@ switch tag_region
             lon_min ',' lat_max '],[' lon_max ',' lat_max '],[' ...
             lon_max ',' lat_min '],[' lon_min ',' lat_min ']]]'];
 end
-% set time period of interest (profiles for all the months in "years" will
-% loaded, until the "end_month" in "end_year"
-years     = 2019:2019;
-months    = 1:3; % except for 12, set the ending month toone month more than
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% set months/years of interest: there are two ways of doing this,
+%%%%%%%%%% select mode and modify the default period for that mode
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+time_mode = 'specific_months';%'from_to';%'specific_months';%
 
+switch time_mode
+    case 'from_to'
+        %%1)%% select start and end month of interest specifying a date
+        date_start = datenum(2019,1,1); % e.g. the starting month will be Feb 2008
+        % (regardless of what you specify as "day" [in this example the "day"
+        % is the 3rd of the month], metadata for the whole month
+        % will be returned; if intersted in restricting also based on the "day",
+        % you can code that in later (please ask us if you have any questions!)
+        date_end   = datenum(2019,2,1);% in this case, metadata will be queried up
+        % to the end of Jan 2009, even if the "day" is specified as the 10th
+        % of the month)
+        % create vectors for months and years of interest
+        tdaily_vec = datevec(date_start:date_end);
+        MMYY       = unique(tdaily_vec(:,1:2),'rows','first');
+        years      = MMYY(:,1);
+        months     = MMYY(:,2);
+    case 'specific_months'
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%2)%%  query the same months in different years (e.g. if you would like to
+        %%see how profiles in the region look like in january and february af all
+        %%the years in the range
+        years_ALL = 2019;
+        months_ALL= 1:2; % except for 12, set the ending month toone month more than
+        [months,years] = ndgrid(months_ALL,years_ALL);
+        months = months(:);
+        years  = years(:);
+end
 % you want your last month to be
 % set pressure range of interest
 presRange='[0,2000]';
@@ -135,10 +166,9 @@ if any(examples2run==2)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%% EXAMPLE 2: query core/Deep Argo profiles in a region and time period
     %%%% of interest
-    for ivars2query=1:2
+    
          vars2query          = {'temp' 'psal'};% this could be any of the other bgc variables
         %%%% set parameters
-        xaxis_var            = vars2query{ivars2query};
         yaxis_var            = 'pres';
         % saving the variable of interest in a netcdf
         % file for each profile
@@ -152,19 +182,21 @@ if any(examples2run==2)
         data_out             = ...
             Argovis_get_regional(years,months,...
             presRange,shape2use,url_beginning,bgc_mode,...
-            var2save_in_nc{ivars2query},var2save_in_nc_units{ivars2query},path_out_nc);
-        %%%% plot profiles that were queried
+            var2save_in_nc,var2save_in_nc_units,path_out_nc);
+        %%%% plot profiles that were queried for each variable
         fig_pos  = [0.1        0.1       1420        700];
-        figure('color','w','position',fig_pos.*[1 1 1 1]);
-        subplot(1,2,1)
-        Argovis_plot_profile_location_and_WMO(data_out,xaxis_var)
-        %
-        subplot(1,2,2)
-        Argovis_plot_profiles(data_out,xaxis_var,yaxis_var)
-        set(gcf,'PaperPositionMode','auto');
-        print('-dpng',['Argovis_region_example_' xaxis_var '.png'],'-r150')
-        %pause
-    end
+        for ivars2query=1:2
+            xaxis_var            = vars2query{ivars2query};
+            figure('color','w','position',fig_pos.*[1 1 1 1]);
+            subplot(1,2,1)
+            Argovis_plot_profile_location_and_WMO(data_out,xaxis_var)
+            %
+            subplot(1,2,2)
+            Argovis_plot_profiles(data_out,xaxis_var,yaxis_var)
+            set(gcf,'PaperPositionMode','auto');
+            print('-dpng',['Argovis_region_example_' xaxis_var '.png'],'-r150')
+            %pause
+        end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -190,6 +222,7 @@ set(gca,'xlim',[min(cell2mat(data_out.lon)) max(cell2mat(data_out.lon))]+[-5 8],
     'fontsize',26)
 xlabel('Longitude')
 ylabel('Latitude')
+set(hl,'fontsize',10)
 title([xaxis_var ' profiles, WMO# in color'])
 set(hl,'fontsize',14)
 end

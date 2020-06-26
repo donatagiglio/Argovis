@@ -1,6 +1,9 @@
 % This script shows how to query an Atmospheric River and Argo profiles in a region and time period of
 % interest and make a plot
 %
+% This script and some of the scripts called within need more work... it
+% may look different in the future...
+%
 % If you are interested in creating a script based on only one of the
 % examples, you can delete sections for other examples. Just make sure to
 % keep functions and parameters that are needed.
@@ -33,15 +36,24 @@ data_folder = [pwd, '/data/'];
 if ~isfolder(data_folder)
     mkdir data
 end
-nc_path = [data_folder, 'Argovis_nc'];
+nc_path = [data_folder, 'Argovis_AR_nc'];
 if ~isfolder(nc_path)
-    mkdir data/Argovis_nc
+    mkdir data/Argovis_AR_nc
 end
+
+fig_path = [data_folder, 'Argovis_AR_fig'];
+if ~isfolder(nc_path)
+    mkdir data/Argovis_AR_fig
+end
+
 
 % set date of interest for AR
 years     = 2017;
 months    = 1;
 dayAR      = 10;
+
+delta_min = 3;
+delta_max = 2;
 
 % you want your last month to be
 % set pressure range of interest
@@ -88,8 +100,8 @@ for a = 1:length(data)
     shape2use = [ 'shape=[[' shape2 ']]'];
     
     % set time limits for Argo profiles
-    day_start = dayAR - 3;
-    day_end   = dayAR + 2; % one day is always added to the time period, so end with one day prior to desired time period
+    day_start = dayAR - delta_min;
+    day_end   = dayAR + delta_max; % one day is always added to the time period, so end with one day prior to desired time period
     days = day_start:day_end;
     
     % get Argo data in AR shape
@@ -144,7 +156,7 @@ for a = 1:length(data)
                 subplot(1,3,3)
                 Argovis_plot_bgc_qc(data_out,xaxis_var,yaxis_var,presRange)
                 set(gcf,'PaperPositionMode','auto');
-                print('-dpng',['Argovis_AR_region_example_' xaxis_var '.png'],'-r150')
+                print('-dpng',[fig_path '/Argovis_AR_region_example_' xaxis_var '.png'],'-r150')
             end
         end
         
@@ -153,24 +165,26 @@ for a = 1:length(data)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%% EXAMPLE 2: query core/Deep Argo profiles in a region and time period
         %%%% of interest
+        
+        vars2query          = {'temp' 'psal'};% this could be any of the other bgc variables
+        %%%% set parameters
+        yaxis_var            = 'pres';
+        % saving the variable of interest in a netcdf
+        % file for each profile
+        var2save_in_nc       = {'temp' 'psal'};% var2save_in_nc = {''} if you don't want to save anything
+        var2save_in_nc_units = {'degC' 'psu'};
+        path_out_nc          = [nc_path, '/core_'];
+        %
+        url_beginning        = 'https://argovis.colorado.edu/selection/profiles/?';
+        %%%% query profiles
+        data_out = Argovis_get_regional_days(years,months,days,...
+            presRange,shape2use,url_beginning,bgc_mode,...
+            var2save_in_nc{ivars2query},var2save_in_nc_units{ivars2query},path_out_nc);
+        %%%% plot profiles that were queried
+        fig_pos  = [0.1        0.1       1420        700];
         for ivars2query=1:2
-            vars2query          = {'temp' 'psal'};% this could be any of the other bgc variables
-            %%%% set parameters
             xaxis_var            = vars2query{ivars2query};
-            yaxis_var            = 'pres';
-            % saving the variable of interest in a netcdf
-            % file for each profile
-            var2save_in_nc       = {'temp' 'psal'};% var2save_in_nc = {''} if you don't want to save anything
-            var2save_in_nc_units = {'degC' 'psu'};
-            path_out_nc          = [nc_path, '/core_'];
-            %
-            url_beginning        = 'https://argovis.colorado.edu/selection/profiles/?';
-            %%%% query profiles
-            data_out = Argovis_get_regional_days(years,months,days,...
-                presRange,shape2use,url_beginning,bgc_mode,...
-                var2save_in_nc{ivars2query},var2save_in_nc_units{ivars2query},path_out_nc);
-            %%%% plot profiles that were queried
-            fig_pos  = [0.1        0.1       1420        700];
+            
             figure('color','w','position',fig_pos.*[1 1 1 1]);
             subplot(1,2,1)
             Argovis_plot_profile_location_and_WMO(data_out,xaxis_var)
@@ -178,7 +192,7 @@ for a = 1:length(data)
             subplot(1,2,2)
             Argovis_plot_profiles(data_out,xaxis_var,yaxis_var)
             set(gcf,'PaperPositionMode','auto');
-            print('-dpng',['Argovis_AR_region_example_' xaxis_var '.png'],'-r150')
+            print('-dpng',[fig_path '/Argovis_AR_region_example_' xaxis_var '.png'],'-r150')
             %pause
         end
     end

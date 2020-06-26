@@ -136,11 +136,13 @@ if ~isempty(data)
             if length(unique({vars{:} flds{:}})) > ...
                     length(vars)
                 disp('Check new (or not recognized) variable name')
-                pause
+%                 vars{:}
+%                 flds{:}
+                %pause
             end
         catch
             disp('Check error')
-            pause;
+            %pause;
         end
         
     end

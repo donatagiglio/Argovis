@@ -103,6 +103,9 @@ for ivar=1:length(vars_names)
         %%%% query profiles
         data_out = Argovis_get_profiles(url,bgc_mode);
         
+        save_netcdf_for_each_profile_in_cell(...
+                    data_out,{vars_names{ivar}},{''},[nc_path '/' vars_names{ivar} '_']);
+        
         if strcmp(vars_names{ivar},'temp')
             lon_temp = data_out(:).lon;
             lat_temp = data_out(:).lat;

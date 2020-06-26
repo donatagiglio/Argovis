@@ -22,13 +22,22 @@ function dataOUT = Argovis_get_regional(years,months,...
 % Argo (2000). Argo float data and metadata from Global Data Assembly Centre 
 % (Argo GDAC). SEANOE. http://doi.org/10.17882/42182
 %
-clear t M YR
 
-end_year  = max(years);
-end_month = max(months);
-mm_ALL   = min(months):end_month;
+% clear t M YR
+% 
+% end_year  = max(years);
+% end_month = max(months);
+% mm_ALL   = min(months):end_month;
+% 
+% [YR,M]   = meshgrid(years,months);
+YR       = years;
+M        = months;
+end_year = YR(end);
+end_month= M(end);
 
-[YR,M]   = meshgrid(years,months);
+if length(M)~=length(YR)
+    disp('Check months/years in input, they should have the same length')
+end
 t        = datenum(YR(:),M(:),15);
 t_eomday = eomdate(YR(:),M(:));
 
@@ -50,11 +59,20 @@ for l=1:length(t)
             
             for i=1:length(vars)
                 % initialize
-                if ~exist(vars{i},'var')
+                if ~exist('dataOUT','var') || ...
+                        (exist('dataOUT','var') && ~isfield(dataOUT,vars{i}))
                     eval(['dataOUT.' vars{i} ' = {};'])
                 end
+                
                 eval(['dataOUT.' vars{i} ' = cat(1,dataOUT.' vars{i} ',data.' vars{i} ''');'])
-            end            
+                
+            end 
+            
+            if ~isempty(var2save_in_nc{1})
+                % save one netcdf for each profile in the cells in data
+                save_netcdf_for_each_profile_in_cell(...
+                    data,var2save_in_nc,var2save_in_nc_units,path_out_nc);
+            end
         end
     end
 end
