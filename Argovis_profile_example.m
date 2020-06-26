@@ -36,7 +36,7 @@ end
 
 % set WMO number and cycle number
 % example for a bgc profile: 
-plat_bufr = '4902480';%'2902534';%'6902686';%'3901668';%
+plat_bufr = '4903203';%'2902534';%'4902480';%'6902686';%'3901668';%
 cyc_bufr  = '2';%'11';%'74';%'34';%
 % % % example for a core profile: 
 % plat_bufr = '2902534';%'4902480';%'6902686';%'3901668';%
