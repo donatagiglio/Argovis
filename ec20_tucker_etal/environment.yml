@@ -1,0 +1,25 @@
+name: ec20_tucker_etal
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - numpy
+  - scipy
+  - datetime
+  - pdb
+  - os
+  - csv
+  - calendar
+  - pip
+  - pip:
+    - nbgitpuller
+    - sphinx-gallery
+    - pandas
+    - matplotlib
+    - requests
+    - cmocean
+    - cartopy
+    - seaborn
+    - warnings
+    
+    
