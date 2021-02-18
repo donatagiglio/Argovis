@@ -1,0 +1,1 @@
+This file contains a link to the Python Jupyter Notebook developed for the EarthCube 2020 meeting to demonstrate Argovis's API capabilities.  The Notebook is contained in a Docker so that users can easily run it as long as Docker is installed on their machine.  Here is the link:  https://github.com/earthcube2020/ec20_tucker_etal
