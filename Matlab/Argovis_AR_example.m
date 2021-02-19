@@ -42,7 +42,7 @@ if ~isfolder(nc_path)
 end
 
 fig_path = [data_folder, 'Argovis_AR_fig'];
-if ~isfolder(nc_path)
+if ~isfolder(fig_path)
     mkdir data/Argovis_AR_fig
 end
 
@@ -176,13 +176,14 @@ for a = 1:length(data)
         path_out_nc          = [nc_path, '/core_'];
         %
         url_beginning        = 'https://argovis.colorado.edu/selection/profiles/?';
-        %%%% query profiles
-        data_out = Argovis_get_regional_days(years,months,days,...
-            presRange,shape2use,url_beginning,bgc_mode,...
-            var2save_in_nc{ivars2query},var2save_in_nc_units{ivars2query},path_out_nc);
+        
         %%%% plot profiles that were queried
         fig_pos  = [0.1        0.1       1420        700];
         for ivars2query=1:2
+            %%%% query profiles
+            data_out = Argovis_get_regional_days(years,months,days,...
+            presRange,shape2use,url_beginning,bgc_mode,...
+            var2save_in_nc{ivars2query},var2save_in_nc_units{ivars2query},path_out_nc);
             xaxis_var            = vars2query{ivars2query};
             
             figure('color','w','position',fig_pos.*[1 1 1 1]);
