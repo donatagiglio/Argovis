@@ -136,7 +136,7 @@ for a = 1:length(data)
             %
             url_beginning        = ...
                 ['https://argovis.colorado.edu/selection/bgc_data_selection?' ...
-                'xaxis=' xaxis_var '&yaxis=' yaxis_var '&'];
+                'meas_1=' xaxis_var '&meas_2=' yaxis_var '&'];
             %%%% query profiles
             data_out             = ...
                 Argovis_get_regional_days(years,months,days,...
@@ -188,13 +188,15 @@ for a = 1:length(data)
             
             figure('color','w','position',fig_pos.*[1 1 1 1]);
             subplot(1,2,1)
-            Argovis_plot_profile_location_and_WMO(data_out,xaxis_var)
-            %
-            subplot(1,2,2)
-            Argovis_plot_profiles(data_out,xaxis_var,yaxis_var)
-            set(gcf,'PaperPositionMode','auto');
-            print('-dpng',[fig_path '/Argovis_AR_region_example_' xaxis_var '.png'],'-r150')
+            if isempty(data_out) == 0
+                Argovis_plot_profile_location_and_WMO(data_out,xaxis_var)
+                %
+                subplot(1,2,2)
+                Argovis_plot_profiles(data_out,xaxis_var,yaxis_var)
+                set(gcf,'PaperPositionMode','auto');
+                print('-dpng',[fig_path '/Argovis_AR_region_example_' xaxis_var '.png'],'-r150')
             %pause
+            end
         end
     end
 end
