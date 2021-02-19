@@ -1,4 +1,4 @@
-% function data_out = Argovis_get_bgc_profiles_in_shape(url)
+ function data_out = Argovis_get_bgc_profiles_in_shape(url)
 
 % this function returns temperature, salinity, pressure, longitude,
 % latitude, time for each profile. More metadata can be read in for
@@ -90,7 +90,7 @@ end
 for i=1:length(vars)
     eval(['data_out.' vars{i} ' = ' vars{i} ';'])
 end
-%end
+end
 function data_out = return_field_from_cell(data_in)
 fx=@(x)any(isempty(x));
 ind=cellfun(fx,data_in);
