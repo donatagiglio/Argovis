@@ -1,7 +1,8 @@
 # Argovis
-You can try one of the examples, running one of the scripts that includes the word "example" in the file name.
-Other scripts are functions that are needed to run the examples.
-We are still working to provide a more detailed description for each script. Also, more scripts will be available in the future. PLEASE ASK US IF YOU HAVE ANY QUESTIONS! WE ARE HAPPY TO HELP!
+
+Welcome to the Argovis GitHub repository!  The scripts in this repository access Argovis (https://argovis.colorado.edu/), a RESTful web app, which contains Argo data, weather events and more. This directory is organized into folders by language, ie Matlab and Python.  Inside the folders are scripts to access Argovis; some scripts simply access the database, while others get data, manipulate it and produce plots.  Each script will be described in this README file, by language, with newer scripts being added at the bottom of each language section.  Further script develeopment is underway, so please check back in the future. PLEASE ASK US IF YOU HAVE ANY QUESTIONS! WE ARE HAPPY TO HELP!
+
+# Python
 
 BGC API in Python (work in progress)
 argovis_bgc_python_api.ipynb
@@ -9,10 +10,12 @@ Retrieves BGC data, but does not plot it.
 
 EC2020_argovis_python_api_js.ipynb
 This is the same notebook as the one prepared for the meeting, seen here https://github.com/earthcube2020/ec20_tucker_etal, but uses basemap rather than cartopy to plot.  
-
+# Matlab
 All Matlab scripts (*.m) are written for Matlab2020.  Older versions of Matlab may work, especially with small changes related to creating pathways and directories. 
 
 Most all scripts allow you to set the pathways for saved data and figures created when running a script.  Please adjust pathway names as needed and remember that the slashes go in different directions for Windows and Mac/Linux machines.   
+
+Scripts with the word 'example' in them are the main scripts and the other ones are functions called in the various 'example' scripts.
 
 Argovis_profile_example.m
 This script retrieves one profile from Argovis, saves it as a netCDF file and plots the profiles based on available variables.
@@ -28,6 +31,18 @@ Argovis_regional_query_example.m
 This script retrieves profiles in a region and time period of interest.  You can choose to retrieve just the BGC profiles or all profiles with the core variables (temp/psal/pres).  Retrieving Deep Argo data is coming soon.  The data are saved as netCDF files and plots are made showing profile locations, profile plots and profile QC plots if you are using the BGC call.  
 Inputs:  region, time period, pressure range and examples2run(either BGC or T/S/p).  The region can either be defined as a simple box (lon_min, lon_max, lat_min, lat_max) or it can be copied from the URL of a shape drawn in the Argovis browser.  Times can be entered in two different formats:  specific_months or from_to.  From_to is pretty straight forward:  you enter a starting and ending month. Specific months allows you to see the same specified months over the years of interested.  In other words, if you specificy 1:3 for months and 2017:2019, the data returned will be for the January, February and March of 2017, 2018 and 2019.  
 Outputs:  data from the region comes back as a structure named 'data_out'.  The data is saved in a netCDF file(s) for each profile and for each variable. Plots are made showing the location of the profiles and profile plots for each available variable (temp, psal for core variables, and doxy, chla, etc. for BGC variables).  If it is a BGC profile, the profile QC plots will also be shown.
+
+Argovis_get_bgc_profiles_in_shape_example_v2.m
+This script retrieves BGC profiles in a region and time period of interest. The region can either be defined as a simple box (lon_min, lon_max, lat_min, lat_max) or it can be copied from the URL of a shape drawn in the Argovis browser.  A time period is set by entering years, months of interest as well as exact ending years and month. 
+Outputs:  data from the region comes back as a structure named 'data'.  The data is saved in a netCDF file(s) for each profile and for each variable. Plots are made showing the location of the profiles and profile plots for each available BGC variable (doxy, chla, etc. for available BGC variables) as well as the profile QC plots. 
+
+Argovis_metadata_example.m
+This script retrieves profile metadata globally for a time period of interest and plots the location of the profiles, a histogram of the maximum pressure reached in the temperature profiles and the timeseries of positioning system used by the float.  
+Inputs:  start and end times are entered in days, months and years.
+Outputs:  metadata comes back as a structure named 'data_out'.  Plots are made showing the location of the profiles, the evolution of the positioning system for each profile over time and a histogram of the maximum pressure reached for each temperature profile.
+
+
+
 
 
 
