@@ -1,1 +1,0 @@
-This folder contains the four main API calls to access Argo profile data:  profiles, platforms, regional queries and metadata.  This blog post (https://www.itsonlyamodel.us/argovis-python-api.html) contains more detailed instructions on how to access Argo profile data and make some plots.  
