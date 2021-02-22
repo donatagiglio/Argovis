@@ -3,13 +3,43 @@
 Welcome to the Argovis GitHub repository!  The scripts in this repository access Argovis (https://argovis.colorado.edu/), a RESTful web app, which contains Argo data, weather events and more. This directory is organized into folders by language, ie Matlab and Python.  Inside the folders are scripts to access Argovis; some scripts simply access the database, while others get data, manipulate it and produce plots.  Each script will be described in this README file, by language, with newer scripts being added at the bottom of each language section.  Further script develeopment is underway, so please check back in the future. PLEASE ASK US IF YOU HAVE ANY QUESTIONS! WE ARE HAPPY TO HELP!
 
 # Python
+**Python_Notebooks**
 
-BGC API in Python (work in progress)
-argovis_bgc_python_api.ipynb
-Retrieves BGC data, but does not plot it.
+**EC2020_Argovis_Python.md**
+This file contains a link to the Python Jupyter Notebook developed for the EarthCube 2020 meeting to demonstrate Argovis's API capabilities. Here is the link: https://github.com/earthcube2020/ec20_tucker_etal
+This Jupyter notebook provides a set of functions for users to retrieve Argo float profiles, platforms, metadata, spatial-temporal selections, and gridded products (including weather events) stored on Argovis. Charts and simple calculations made by the output of these functions provide users the means to write their python scripts. We have bundled the required libraries into a Docker container so that users do not need to install python libraries manually. All software dependencies are installed in the Docker container and run the notebooks within the docker environment. Instructions on how to build and run the container are included.
 
-EC2020_argovis_python_api_js.ipynb
-This is the same notebook as the one prepared for the meeting, seen here https://github.com/earthcube2020/ec20_tucker_etal, but uses basemap rather than cartopy to plot.  
+**EC2020_argovis_python_api_js.ipynb**
+This is the same notebook as prepared for the Earth Cube 2020 meeting, seen here https://github.com/earthcube2020/ec20_tucker_etal, but uses basemap rather than cartopy to plot. Here is the description of that 
+We provide a set of functions in a Jupyter notebook for users to retrieve Argo float profiles, platforms, metadata, spatial-temporal selections, and gridded products (including weather events) stored on Argovis. Charts and simple calculations made by the output of these functions provide users the means to write their python scripts. We have bundled the required libraries into a Docker container so that users do not need to install python libraries manually. All software dependencies are installed in the Docker container and run the notebooks within the docker environment. Instructions on how to build and run the container are included.
+
+**argovis_bgc_python_api.ipynb**
+This BGC API in Python is a work in progress and it retrieves BGC data, but does not plot it.
+
+**Other Scripts**
+All scripts in this folder are written for Python 3.  They may work on Python 2.7, but they have not been tested.
+
+**API_Argovis_get_profile.py**
+This script retrieves an Argo profile from Argovis and saves it as a csv file.
+Input:  float WMO number and cycle number
+Output:  data from profile comes back as a dictionary named 'profileDict' and saves it to a csv file called 'profile.csv'.
+
+**API_Argovis_get_platform.py**
+This script retrieves all the profiles from an Argo platform/float in Argovis and saves it as a csv file.
+Input:  float WMO number
+Output:  data from platform comes back as a dictionary named 'platformDf' and saves it to a csv file called 'platform.csv'.
+
+**API_Argovis_get_data_region.py**
+This script retrieves all Argo profiles in a selected region and time from Argovis and saves it as a csv file.
+Input:  start date and end date as well as a shape for the region.  The coordinates from a drawn shape on the Argovis browser can be copied from the URL and pasted in.
+Output:  data from platform comes back as a dictionary named 'selectionProfiles' and saves it to a csv file called 'region.csv'.
+
+**API_Argovis_get_global_metadata.py**
+This script retrieves profile metadata globally for a time period of interest and saves it as a csv file.
+Input:  month and year of interest
+Output:  data from platform comes back as a dictionary named 'metaDf' and saves it to a csv file called 'meta.csv'.
+
+
 # Matlab
 All Matlab scripts (*.m) are written for Matlab2020.  Older versions of Matlab may work, especially with small changes related to creating pathways and directories. 
 
