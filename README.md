@@ -17,6 +17,7 @@ We provide a set of functions in a Jupyter notebook for users to retrieve Argo f
 This BGC API in Python is a work in progress and it retrieves BGC data, but does not plot it.
 
 **Other Scripts**
+
 All scripts in this folder are written for Python 3.  They may work on Python 2.7, but they have not been tested.
 
 **API_Argovis_get_profile.py**
