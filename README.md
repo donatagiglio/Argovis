@@ -47,6 +47,11 @@ This script retrieves Atmospheric River weather events in a 36-hour window and t
 Inputs:  Date for Atmospheric River weather event, desired pressure range to retrieve Argo profile data, and selection of either core or BGC Argo profiles to return.
 Outputs: profile data comes back as a structure named 'data_out'.  Plots are made showing the location of the profiles and profile plots for each available variable (temp, psal for core variables, and doxy, chla, etc. for BGC variables).  If it is a BGC profile, the profile QC plots will also be shown.
 
+Argovis_SOSE_sea_ice_coverage.m
+This script retrieves SOSE sea ice coverage in a region and time period of interest and plots it.  All Argo profiles in that region and time, including BGC, are also received and plotted on the same plot.  
+Inputs:  Date and region of interest which is a box.
+Outputs:  The SOSE sea ice coverage comes back as a structure named 'd' and the Argo profile data comes back in a structure named 'prof'.  Both the sea ice coverage and the Argo profile locations are plotted on a figure that is created and saved starting with the set variable name 'fig_path' and ending with 'SOSE_sea_ice_and_argo.png'.
+
 
 
 
