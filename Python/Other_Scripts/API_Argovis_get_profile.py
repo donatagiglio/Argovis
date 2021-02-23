@@ -4,12 +4,8 @@
 
 import requests
 import pandas as pd
-import numpy as np
-from scipy.interpolate import griddata
-from datetime import datetime
-import pdb
 import os
-from netCDF4 import Dataset as netcdf_dataset
+
 
 #####
 # Get current directory to save file into
