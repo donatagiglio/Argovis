@@ -1,4 +1,4 @@
-# Argovis
+## Argovis ##
 
 Welcome to the Argovis GitHub repository!  The scripts in this repository access Argovis (https://argovis.colorado.edu/), a RESTful web app, which contains Argo data, weather events and more. This directory is organized into folders by language, ie Matlab and Python.  Inside the folders are scripts to access Argovis; some scripts simply access the database, while others get data, manipulate it and produce plots.  Each script will be described in this README file, by language, with newer scripts being added at the bottom of each language section.  Further script develeopment is underway, so please check back in the future. PLEASE ASK US IF YOU HAVE ANY QUESTIONS! WE ARE HAPPY TO HELP!
 
