@@ -13,4 +13,5 @@ dependencies:
     - nbgitpuller
     - sphinx-gallery
     - pandas
+    - numpy
     - matplotlib
