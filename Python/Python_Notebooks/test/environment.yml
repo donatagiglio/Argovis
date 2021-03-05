@@ -1,8 +1,7 @@
-name: example-environment
-channels:
-  - conda-forge
+name: test
 dependencies:
   - numpy
+  - matplotlib
   - psutil
   - toolz
   - matplotlib
