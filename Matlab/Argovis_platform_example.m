@@ -47,8 +47,8 @@ disp('>>>> Argovis platform API running: ')
 %%%% requested for bgc variables)
 %
 %%%% set parameters
-platform_number = '5904684';%'4903203';%'2903354'; %
-pressure_axis   = 5:10:6000;% (to be used for interpolation)
+platform_number =  '5904684';%'4903203';%'2903354'; %'5904492'
+pressure_axis   = 5:10:2000;% (to be used for interpolation)
 
 %%%% load variables available for that float
 % load data for one variable to look at the metadata (i.e. what variables
@@ -93,6 +93,7 @@ catch
         platform_number '/?xaxis=pres&yaxis='];
 end
 %%%% load data for each of the available variables and make a plot
+%% 
 fig_pos  = [0.1        0.1       1420        700];
 for ivar=1:length(vars_names)
     if ~strcmp(vars_names{ivar},'pres')
@@ -184,15 +185,27 @@ date      = cell2mat(data_out.date);
 d_gridded = nan(length(pressure_axis),length(date));
 pmn = [];
 pmm = [];
+msk = true(length(date),1);
 for i=1:length(date)
-    if ~isempty(data_out.pres{i})
-        d_gridded(:,i) = interp1(data_out.pres{i},d{i},pressure_axis);
+    %     if ~isempty(data_out.pres{i})
+    if ~isempty(d{i}(~isnan(d{i})))
+        try
+            d_gridded(:,i) = interp1(data_out.pres{i}(~isnan(d{i})),d{i}(~isnan(d{i})),pressure_axis);
+        catch
+            test
+        end
+        if ~isnan(sum(d_gridded(:,i)))
+            msk(i) = true;
+        end
         pmn = min([pmn data_out.pres{i}]);
         pmm = max([pmm data_out.pres{i}]);
     end
 end
 [date,I] = unique(date);
-contourf(date,pressure_axis,d_gridded(:,I),cf);colorbar
+% mskI = msk(I);
+dtoplot = d_gridded(:,I);
+contourf(date,pressure_axis,dtoplot,cf);colorbar
+% contourf(date,pressure_axis,d_gridded(:,I),cf);colorbar
 axis ij
 axis tight
 set(gca,'fontsize',26,'ylim',[floor(pmn) ceil(pmm)])
@@ -217,15 +230,17 @@ date      = cell2mat(data_out.date);
 d_gridded = nan(length(pressure_axis),length(date));
 pmn = [];
 pmm = [];
+
 for i=1:length(date)
-    if ~isempty(data_out.pres{i})
-        d_gridded(:,i) = interp1(data_out.pres{i},d{i},pressure_axis);
+    if ~isempty(d{i}(~isnan(d{i})))
+        d_gridded(:,i) = interp1(data_out.pres{i}(~isnan(d{i})),d{i}(~isnan(d{i})),pressure_axis);        
         pmn = min([pmn data_out.pres{i}]);
         pmm = max([pmm data_out.pres{i}]);
     end
 end
 [date,I] = unique(date);
-pcolor(date,pressure_axis,d_gridded(:,I));shading flat;colorbar
+dtoplot = d_gridded(:,I);
+pcolor(date,pressure_axis,dtoplot);shading flat;colorbar
 axis ij
 axis tight
 set(gca,'fontsize',26,'ylim',[floor(pmn) ceil(pmm)])
