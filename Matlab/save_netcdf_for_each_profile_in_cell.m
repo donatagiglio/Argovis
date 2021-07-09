@@ -29,7 +29,11 @@ if isfield(data,'pres')
         if isfield(data,'pres') && ~isempty(data.pres{i})
             filename_out = [path_out_nc data.x_id{i} '.nc'];
             if exist(filename_out,'file')~=0
-                eval(['! rm ' filename_out])
+                if ispc 
+                    eval(['!del /f ' strrep(filename_out,'/','\')])
+                else
+                    eval(['! rm ' filename_out])
+                end                
             end
             % create schema
             clear mySchema
@@ -113,25 +117,28 @@ if isfield(data,'pres')
                 end
             end
             
-            
-            
-            % write schema
-            ncwriteschema(filename_out, mySchema);
-            
-            % write data
-            dim2add      = {'LONGITUDE' 'LATITUDE' 'PRESSURE' 'TIME'};
-            dim2add_name = {'data.lon{i}' 'data.lat{i}' 'data.pres{i}' 'data.date{i}'};
-            for j=1:length(dim2add)
-                clear var_bfr;eval(['var_bfr = ' dim2add_name{j} ''';'])
-                ncwrite(filename_out,dim2add{j},var_bfr)
-            end
-            for j=1:length(var2save_in_nc)
-                clear var_bfr*;eval(['var_bfr = data.' var2save_in_nc{j} '{i};'])
-                if ~isempty(var_bfr)
-                    var_bfr(isnan(var_bfr)) = -999;
-                    var_bfr4d          = nan(1,1,size(var_bfr,2),1);
-                    var_bfr4d(1,1,:,1) = var_bfr;
-                    ncwrite(filename_out,var2save_in_nc{j},var_bfr4d(:,:,:,1))
+            if ~isempty(var_bfr)
+%                 try
+                % write schema
+                ncwriteschema(filename_out, mySchema);  
+%                 catch
+%                     stop
+%                 end
+                % write data
+                dim2add      = {'LONGITUDE' 'LATITUDE' 'PRESSURE' 'TIME'};
+                dim2add_name = {'data.lon{i}' 'data.lat{i}' 'data.pres{i}' 'data.date{i}'};
+                for j=1:length(dim2add)
+                    clear var_bfr;eval(['var_bfr = ' dim2add_name{j} ''';'])
+                    ncwrite(filename_out,dim2add{j},var_bfr)
+                end
+                for j=1:length(var2save_in_nc)
+                    clear var_bfr*;eval(['var_bfr = data.' var2save_in_nc{j} '{i};'])
+                    if ~isempty(var_bfr)
+                        var_bfr(isnan(var_bfr)) = -999;
+                        var_bfr4d          = nan(1,1,size(var_bfr,2),1);
+                        var_bfr4d(1,1,:,1) = var_bfr;
+                        ncwrite(filename_out,var2save_in_nc{j},var_bfr4d(:,:,:,1))
+                    end
                 end
             end
         end
