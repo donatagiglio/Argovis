@@ -66,11 +66,6 @@ vars= {...
     'date' 'lon' 'lat' ...
     'cycle_number' 'platform_number' 'x_id'};
 %
-if bgc_mode==1
-    meas_mode = 'bgcMeas';
-else
-    meas_mode = 'measurements';
-end
 
 for i=1:length(vars)
     eval([vars{i} ' = {};'])
@@ -87,6 +82,17 @@ if ~isempty(data)
         end
         
         for j=1:length(vars)
+            clear bfr
+            bfr = data(i);
+            if iscell(bfr)
+                bfr = data{i};
+            end
+            if isfield(bfr,'bgcMeasKeys') && bgc_mode == 1
+                meas_mode = 'bgcMeas';
+            else
+                meas_mode = 'measurements';
+            end
+                
             if iscell(data)
                 if eval(['isfield(data{i}.' meas_mode ',vars{j})'])
                     eval([vars{j} '0 = ' ...
