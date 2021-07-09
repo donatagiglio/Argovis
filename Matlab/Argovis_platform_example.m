@@ -47,7 +47,7 @@ disp('>>>> Argovis platform API running: ')
 %%%% requested for bgc variables)
 %
 %%%% set parameters
-platform_number =  '5904684';%'4903203';%'2903354'; %'5904492'
+platform_number =  '5904479';%'4903203';%'2903354'; %'5904492'
 pressure_axis   = 5:10:2000;% (to be used for interpolation)
 
 %%%% load variables available for that float
@@ -55,42 +55,53 @@ pressure_axis   = 5:10:2000;% (to be used for interpolation)
 % are available for the float of interest)
 opt = weboptions('Timeout',20,'UserAgent', 'http://www.whoishostingthis.com/tools/user-agent/', 'CertificateFilename','');
 % create a list of all the variables available
-try
-    % bgc platform case
-    url0      = ['https://argovis.colorado.edu/catalog/bgc_platform_data/' ...
-        platform_number '/?xaxis=pres&yaxis=temp'];
-    data0     = webread(url0,opt);
-    bgc_mode        = 1;
 
-    vars_names = {};
-    for i=1:length(data0)
-        try
-            vars_names = unique({vars_names{:} data0(i).bgcMeasKeys{:}});
-        catch
-            vars_names = unique({vars_names{:} data0{i}.bgcMeasKeys{:}});
-        end
+% bgc platform case
+url0      = ['https://argovis.colorado.edu/catalog/bgc_platform_data/' ...
+    platform_number '/?xaxis=pres&yaxis=temp'];
+data0     = webread(url0,opt);
+
+
+vars_names = {};
+for i=1:length(data0)
+    clear bfr
+    bfr = data0(i);
+    if iscell(bfr)
+        bfr = data0{i};
     end
+    if isfield(bfr,'bgcMeasKeys')
+        vars_names = unique({vars_names{:} bfr.bgcMeasKeys{:}});
+    end
+end
+
+
+
+% non-bgc platform case
+url0      = ['https://argovis.colorado.edu/catalog/platforms/' ...
+    platform_number '/?xaxis=pres&yaxis=temp'];
+data0     = webread(url0,opt);
+
+% create a list of all the variables available
+
+for i=1:length(data0)
+    try
+        vars_names = unique({vars_names{:} data0(i).station_parameters{:}});
+    catch
+        vars_names = unique({vars_names{:} data0{i}.station_parameters{:}});
+    end
+end
+
+if sum(strcmp(vars_names,'temp')) + sum(strcmp(vars_names,'pres')) + ...
+        sum(strcmp(vars_names,'psal')) ...
+        < length(vars_names)
+    
     url_beginning = ['https://argovis.colorado.edu/catalog/bgc_platform_data/' ...
         platform_number '/?xaxis=pres&yaxis='];
-    
-catch
-    % non-bgc platform case
-    url0      = ['https://argovis.colorado.edu/catalog/platforms/' ...
-        platform_number '/?xaxis=pres&yaxis=temp'];
-    data0     = webread(url0,opt);
-    bgc_mode = 0;
-    % create a list of all the variables available
-    
-    vars_names = {};
-    for i=1:length(data0)
-        try
-            vars_names = unique({vars_names{:} data0(i).station_parameters{:}});
-        catch
-            vars_names = unique({vars_names{:} data0{i}.station_parameters{:}});
-        end
-    end
+    bgc_mode = 1;
+else
     url_beginning = ['https://argovis.colorado.edu/catalog/platforms/' ...
         platform_number '/?xaxis=pres&yaxis='];
+    bgc_mode = 0;
 end
 %%%% load data for each of the available variables and make a plot
 %% 
@@ -154,8 +165,10 @@ function Argovis_scatter_plot(data_out,var)
 d    = eval(['data_out.'  var ';']);
 date = cell2mat(data_out.date);
 for i=1:length(data_out.date)
-    scatter(date(i).*ones(size(d{i})),data_out.pres{i},30,d{i},'filled')
-    hold on
+    if ~isempty(d{i})
+        scatter(date(i).*ones(size(d{i})),data_out.pres{i},30,d{i},'filled')
+        hold on
+    end
 end
 axis ij;colorbar
 set(gca,'fontsize',26)
